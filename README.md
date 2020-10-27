@@ -10,9 +10,10 @@ The DOC seal and logo, or the seal and logo of a DOC bureau, shall not be used i
 <!-- badges: start -->
 <!-- badges: end -->
 
-The goal of datacall is to create a clear workflow for pulling and cleaning data for rockfish fishery stock assessments based upon the ADMB rockfish assessment model.
+## rockfishr
+The goal of rockfishr is to create a clear workflow for pulling and cleaning data for rockfish fishery stock assessments based upon the ADMB rockfish assessment model.
 It utilizes a "project oriented workflow" via RStudio.
-You must be able to have a connection to the AFSC & AKFIN data servers (e.g., VPN if offsite), and have usernames/passwords setup.
+You must be able to have a connection to the AFSC & AKFIN (Answers) data servers (e.g., VPN if offsite), and have usernames/passwords setup.
 
 ## Installation
 

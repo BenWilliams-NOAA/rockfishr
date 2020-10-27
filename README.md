@@ -17,11 +17,11 @@ You must be able to have a connection to the AFSC & AKFIN (Answers) data servers
 
 ## Installation
 
-You can install the released version of datacall from [github](https://github.com/BenWilliams-NOAA/datacall) with:
+You can install the released version of datacall from [github](https://github.com/BenWilliams-NOAA/rockfishr) with:
 
 ``` r
 # install.packages("devtools")
-devtools::install_github("ben-williams/datacall")
+devtools::install_github("BenWilliams/rockfishr")
 ```
 
 ## Example

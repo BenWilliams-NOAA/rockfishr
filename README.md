@@ -88,32 +88,32 @@ concat_dat(year, "m18.2b", rec_age, plus_age)
 # run models ----
 ```
 
-Run the ADMB model.  
+Run ADMB for each model.  
 This is best done through the command line for each model desired.  
 `admb updated_nr`  
 `updated_nr - mcmc 10000000 mcsave 2000`  
 `updated_nr -mceval`
 
-
 Process model results and create figures.
 ```{r}
 # explore multiple outputs ----
 model = "db"
-process_results(year, model, model_name, data_name, rec_age, plus_age, mcmc = 100000, mcsave = 100)
+mcmc = 10000000 
+mcsave = 2000
+
+process_results(year, model, model_name, data_name, rec_age, plus_age, mcmc, mcsave)
 base_plots(year, model, model_name, rec_AGE)
 
-
 model = "m18.2"
-process_results(year, model, model_name, data_name, rec_age, plus_age, mcmc = 100000, mcsave = 100, survey = "VAST_estimate_mesa.csv")
+process_results(year, model, model_name, data_name, rec_age, plus_age, mcmc, mcsave, survey = "VAST_estimate_mesa.csv")
 base_plots(year, model, model_name, rec_AGE)
 
 model = "m18.2a"
-process_results(year, model, model_name, data_name, rec_age, plus_age, mcmc = 100000, mcsave = 100, survey = "VAST_estimates.csv")
+process_results(year, model, model_name, data_name, rec_age, plus_age, mcmc, mcsave, survey = "VAST_estimates.csv")
 base_plots(year, model, model_name, rec_AGE)
 
-
 model = "m18.2b"
-process_results(year, model, model_name, data_name, rec_age, plus_age, mcmc = 100000, mcsave = 100, survey = "VAST_estimates.csv")
+process_results(year, model, model_name, data_name, rec_age, plus_age, mcmc, mcsave, survey = "VAST_estimates.csv")
 base_plots(year, model, model_name, rec_AGE)
 ```
 

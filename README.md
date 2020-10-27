@@ -16,7 +16,7 @@ You must be able to have a connection to the AFSC & AKFIN data servers (e.g., VP
 
 ## Installation
 
-You can install the released version of datacall from [github](https://github.com/ben-williams/datacall) with:
+You can install the released version of datacall from [github](https://github.com/BenWilliams-NOAA/datacall) with:
 
 ``` r
 # install.packages("devtools")

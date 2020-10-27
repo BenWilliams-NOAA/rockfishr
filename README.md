@@ -24,13 +24,13 @@ You can install the released version of datacall from [github](https://github.co
 devtools::install_github("BenWilliams/rockfishr")
 ```
 
-## Example
+## Example for 2020 assessment
 
 
 ``` r
 library(datacall)
 
-# gloabls ----
+# globals ----
 
 species = "NORK" # northern rockfish
 year = 2020 # assessment year
@@ -38,6 +38,7 @@ afsc_user = "your_afsc_username"
 afsc_pwd = "your_afsc_password"
 akfin_user = "your_akfn_username"
 akfin_pwd = "your_akfin_password"
+
 admb_home = "C:/Program Files (x86)/ADMB-12.1" # location ADMB exists on *my* computer
 TAC = c(3786, 3681, 4528) # last three years of TAC (year-3, year-2, year-1)
 rec_age = 2 # recruitment age
@@ -59,50 +60,72 @@ Then clean up the raw data which will be placed in the `year/data/output` folder
 
 ```{r}
 # catch and biomass data ----
-survey_biomass(year) # if no file is identified then the DB survey estimate is used
-clean_catch(year, TAC)
+# note: must provide file for VAST or DB estimates are output
+# design-based model
+survey_biomass(year) 
+concat_dat(year, "db", rec_age, plus_age)
 
-# the reader_tester file can  be changed
-ageage(reader_tester = "reader_tester_old.csv", species, year, admb_home) # file provide in "user_input" folder
+# VAST "bridge model"
+survey_biomass(year, "VAST_estimate_mesa.csv") 
+concat_dat(year, "m18.2", rec_age, plus_age)
+
+# VAST GAP assessment
+survey_biomass(year, "VAST_estimates.csv") 
+concat_dat(year, "m18.2a", rec_age, plus_age)
+
+# new age-error matrix ----
+# rerun functions as some are dependent on age error matrix output
+# updated (as of 2020-10) reader_tester file
+ageage(reader_tester = NULL, species, year, admb_home) # read_tester file is provide in the "user_input" folder
 fish_age_comp(year, rec_age, plus_age)
 survey_age_comp(year, rec_age, plus_age)
 fish_size_comp(year, rec_age)
 survey_size_comp(year)
 size_at_age(year, admb_home, rec_age)
 weight_at_age(year, admb_home, rec_age)
+concat_dat(year, "m18.2b", rec_age, plus_age)
+
+# run models ----
 ```
 
-*note: must provide file for VAST estimates in the "user_input" folder, otherwise this will output the design-based biomass estimate*
+Run the ADMB model.  
+This is best done through the command line for each model desired.  
+admb updated_nr
+updated_nr - mcmc 10000000 mcsave 2000
+updated_nr -mceval
+
+
+Process model results and create figures.
+```{r}
+# explore multiple outputs ----
+model = "db"
+process_results(year, model, model_name, data_name, rec_age, plus_age, mcmc = 100000, mcsave = 100)
+base_plots(year, model, model_name, rec_AGE)
+
+
+model = "m18.2"
+process_results(year, model, model_name, data_name, rec_age, plus_age, mcmc = 100000, mcsave = 100, survey = "VAST_estimate_mesa.csv")
+base_plots(year, model, model_name, rec_AGE)
+
+model = "m18.2a"
+process_results(year, model, model_name, data_name, rec_age, plus_age, mcmc = 100000, mcsave = 100, survey = "VAST_estimates.csv")
+base_plots(year, model, model_name, rec_AGE)
+
+
+model = "m18.2b"
+process_results(year, model, model_name, data_name, rec_age, plus_age, mcmc = 100000, mcsave = 100, survey = "VAST_estimates.csv")
+base_plots(year, model, model_name, rec_AGE)
+```
+
+Run the retrospective model
 
 ```{r}
-survey_biomass(year, "VAST_estimates.csv")
-
-# biological data ----
-clean_catch(year, TAC)
-survey_biomass(year)
-fish_age_comp(year, rec_age, plus_age)
-survey_age_comp(year, rec_age, plus_age)
-fish_size_comp(year, rec_age)
-survey_size_comp(year)
-size_at_age(year, admb_home, rec_age, plus_age)
-weight_at_age(year, admb_home, rec_age, plus_age)
-ageage(reader_tester = NULL, species, year, admb_home) # read_tester file is provide in the "user_input" folder
-
+# run retro ----
+run_retro(year, model = "m18.2b", tpl_name = "updated_nr", n_retro = 10, admb_home = admb_home)
 ```
 
-A .dat file will be placed in the model folder (users choice)
-
-```{r}
-# create dat file ----
-model = "m1"
-concat_dat(year, model, rec_age, plus_age)
-```
-
-Run the ADMB model.
 Clean up model results.
 
 ```{r}
-process_results(year, model, model_name, dat_name, rec_age, plus_age, mcmcm = 10000000, mcsave = 2000, survey = "VAST_estimates.csv"")
-base_plots(year, model, model_name, rec_AGE)
-
+process_retro(year, model, model_name, dat_name, rec_age, plus_age, mcmcm = 10000000, mcsave = 2000, survey = "VAST_estimates.csv"")
 ```

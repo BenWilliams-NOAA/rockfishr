@@ -90,8 +90,8 @@ concat_dat(year, "m18.2b", rec_age, plus_age)
 
 Run the ADMB model.  
 This is best done through the command line for each model desired.  
-admb updated_nr
-updated_nr - mcmc 10000000 mcsave 2000
+admb updated_nr  
+updated_nr - mcmc 10000000 mcsave 2000  
 updated_nr -mceval
 
 

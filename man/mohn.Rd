@@ -2,25 +2,23 @@
 % Please edit documentation in R/mohn.R
 \name{mohn}
 \alias{mohn}
-\title{Calculate Mohn's rho}
+\title{Calculate Mohn's rho "mean version"}
 \usage{
-mohn(x)
+mohn(year, model, n_retro = 10)
 }
 \arguments{
-\item{x}{retro data - a matrix or dataframe with years as rownames}
+\item{year}{assessment year}
 
-\item{peels}{defaults to 10, or NULL to use all retro data}
+\item{model}{folder model is in}
 
-\item{details}{whether to return the intermediate calculations of relative bias.}
-
-\item{plot}{whether to plot the retrospective trajectories.}
+\item{n_retro}{number of retrospective analyses to do (default = 10)}
 }
 \value{
 
 }
 \description{
-Calculate Mohn's rho
+Calculate Mohn's rho "mean version"
 }
 \examples{
-mohn(data)
+mohn(year, model)
 }

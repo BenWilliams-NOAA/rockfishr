@@ -39,9 +39,7 @@ plot_retro_survey <- function(year, model, n_retro = 10){
   }
 
   # pull in data
-  age_yr = read.csv(here::here(year, model, "processed", "ages_yrs.csv"))
-  ages = age_yr %>%dplyr::select(ages) %>% tidyr::drop_na() %>% dplyr::pull(ages)
-  styr_rec = age_yr$styr_rec[1]
+    styr_rec = age_yr$styr_rec[1]
 
   retro_yrs = (year - n_retro + 1):year
 

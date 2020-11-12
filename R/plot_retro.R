@@ -14,7 +14,11 @@ plot_retro <- function(year, model, n_retro = 10){
   max_year = year
   # loop through mcmc output
   age_yr = read.csv(here::here(year, model, "processed", "ages_yrs.csv"))
-  yrs = age_yr %>%dplyr::select(ages) %>% tidyr::drop_na() %>% dplyr::pull(ages)
+  yrs = age_yr %>%
+    dplyr::select(ages) %>% 
+    tidyr::drop_na() %>% 
+    dplyr::pull(ages)
+  styr_rec = age_yr[1,3] 
   retro_yrs = (year - n_retro + 1):year
 
   dat = list()

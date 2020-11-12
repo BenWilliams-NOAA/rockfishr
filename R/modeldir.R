@@ -45,6 +45,7 @@ modeldir <- function(year){
     dir.create(here::here(year,"data/models", "length_sd"), recursive=TRUE)
   }
 
+
   file.copy(system.file("models", "AGEAGE.tpl", package = "datacall"),
             here::here(year, "data", "models", "ageage"))
 

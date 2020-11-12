@@ -5,7 +5,10 @@
 #' @return
 #' @export plot_re
 #'
-#' @examples plot_re("Y:/ABL_MESA/SAFES2020/Apportionment/Plot data - NR")
+#' @examples
+#' \dontrun{
+#' plot_re(location)
+#' }
 #'
 plot_re <- function(location){
 

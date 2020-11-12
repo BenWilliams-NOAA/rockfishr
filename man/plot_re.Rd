@@ -16,6 +16,8 @@ plot_re(location)
 plot random effects model by GOA area
 }
 \examples{
-plot_re("Y:/ABL_MESA/SAFES2020/Apportionment/Plot data - NR")
+\dontrun{
+plot_re(location)
+}
 
 }

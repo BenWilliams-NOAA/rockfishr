@@ -1,10 +1,10 @@
 
 #' Title
 #'
-#' @param read_tester = location and file name (if left blank it looks for a file in "data/user_input/reader_tester.csv")
+#' @param read_tester = if left blank it looks for the following file:"data/user_input/reader_tester.csv"
 #' @param species = "NORK"
 #' @param year = year of the assessment
-#' @param admb_home = location admb exists on your computer
+#' @param admb_home = location admb exists on your computer - if is "c:/admb" can leave NULL
 #' @param region = "GOA" (BSAI not currently setup)
 #' @param rec_age = recruitment age
 #' @param plus_age = max age for modeling
@@ -22,7 +22,7 @@ ageage <- function(reader_tester = NULL, species, year, admb_home = NULL, region
   if(is.null(reader_tester)){
     rt = read.csv(here::here(year, "data", "user_input", "reader_tester.csv"))
   } else{
-    rt = read.csv(here::here(year, "data", "user_input", reader_tester))
+    rt = read.csv(rstudioapi::selectFile("Select File"))
   }
 
   if(species == "NORK"){

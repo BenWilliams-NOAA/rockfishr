@@ -1,14 +1,15 @@
 #' Get the survey biomass
 #'
 #' @param year of interest
-#' @param type: if not using the design-based abundance, the file name must be stated (e.g. "GAP_VAST.csv")
+#' @param type if not using the design-based abundance, the file name must be stated (e.g. "GAP_VAST.csv")
+#' @param file
 #'
 #' @return
 #' @export survey_biomass
 #'
 #' @examples
 #'
-survey_biomass <- function(year, file = NULL){
+survey_biomass <- function(year, type = NULL, file = NULL){
 
   if(is.null(file)){
 

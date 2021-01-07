@@ -1,5 +1,8 @@
 ---
 title: "rockfishr"
+subtitle: "Common code for ABL rockfish assessments"
+author: Benjamin Williams (ben.williams@noaa.gov)
+date:    
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{rockfishr}
@@ -10,10 +13,264 @@ vignette: >
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = "#>",
+  eval = FALSE
 )
 ```
 
+## Goal
+
+The goal of rockfishr is to create a clear workflow for pulling and cleaning data for rockfish fishery stock assessments based upon the ADMB rockfish assessment model. It utilizes a "project oriented workflow" via RStudio. You must be able to have a connection to the AFSC & AKFIN (Answers) data servers (e.g., VPN if offsite), and have usernames/passwords setup.
+
+## Installation
+The `rockfishr` package can be installed from [github](https://github.com/BenWilliams-NOAA/rockfishr) with:
+```{r}
+# install.packages("devtools")
+devtools::install_github("BenWilliams/rockfishr")
+```
+
+
+## Use
+
+There are a suite of "global" items that are used repeatedly in the `rockfishr` package. 
+Currently the package is setup to deal with northern rockfish "NORK" or dusky rockfish "DUSK", other species can be added as needed. 
+
+
 ```{r setup}
 library(rockfishr)
+
+# globals ----
+
+species = "NORK" # northern rockfish
+year = 2020 # assessment year
+afsc_user = "your_afsc_username"
+afsc_pwd = "your_afsc_password"
+akfin_user = "your_akfn_username"
+akfin_pwd = "your_akfin_password"
+
+admb_home = "C:/Program Files (x86)/ADMB-12.1" # location admb exists on your computer 
+                                               # if is "c:/admb" can leave NULL
+TAC = c(3786, 3681, 4528) # last three years of TAC (year-3, year-2, year-1)
+rec_age = 2 # recruitment age
+plus_age = 45 # plus group age
+model_name = "updated_nr" # name of ADMB .tpl file
+dat_name = "goa_nr_2020" # name of ADMB .dat file
+
+mcmc = 1e+07 # number of mcmc draws
+mcsave = 2000 # number of saved mcmc draws
+
 ```
+
+### Create directories
+
+The first function creates a number of directories within your R project folder. The setup is organized by year within a folder. 
+Using the globals above in the `modeldir()` function would create the following folders and files:
+
+```{r}
+# setup folders -----
+
+modeldir(year)
+
+```
+```
+project
+|__2020
+    |__data
+        |__models
+        |    |__ageage
+        |    |     AGEAGE.tpl
+        |    |__allometric
+        |    |     allometric.tpl
+        |    |__length_sd
+        |    |     lengthSD.tpl
+        |    |__VBL
+        |    |      VBL.tpl
+        |    |__wVBL
+        |    |      wVBL.tpl
+        |    |      lvb.ctl
+        |
+        |__output
+        |__raw
+        |__SARA
+        |__user_input
+
+```
+
+This can then be updated for each year. 
+
+```{r}
+# setup folders -----
+
+modeldir("2021")
+
+```
+
+Which would create a duplication of the folders for the given year
+
+```
+project
+|__2020
+|   |__data
+|       |__models
+|       |    |__ageage
+|       |    |     AGEAGE.tpl
+|       |    |__allometric
+|       |    |     allometric.tpl
+|       |    |__length_sd
+|       |    |     lengthSD.tpl
+|       |    |__VBL
+|       |    |      VBL.tpl
+|       |    |__wVBL
+|       |    |      wVBL.tpl
+|       |    |      lvb.ctl
+|       |
+|       |__output
+|       |__raw
+|       |__SARA
+|       |__user_input
+|__2021
+    |__data
+        |__models
+        |    |__ageage
+        |    |     AGEAGE.tpl
+        |    |__allometric
+        |    |     allometric.tpl
+        |    |__length_sd
+        |    |     lengthSD.tpl
+        |    |__VBL
+        |    |      VBL.tpl
+        |    |__wVBL
+        |    |      wVBL.tpl
+        |    |      lvb.ctl
+        |
+        |__output
+        |__raw
+        |__SARA
+        |__user_input        
+
+```
+
+### Query raw data
+
+The next step is to query the raw data from the AKFIN and AFSC databases. 
+
+```{r}
+# query databases ----
+raw_data(species, year, afsc_user, afsc_pwd, akfin_user, akfin_pwd)
+```
+
+The initial output will be raw data pulls that will be placed in the `year/data/raw` folder.
+These are kept in the "raw" format with an associated timestamp of when the data were queried.
+To see the queries being perfomed one can either type `raw_data` in their console and hit `enter`, or explore the code on [github](https://github.com/BenWilliams-NOAA/rockfishr/blob/main/R/raw_data.R).
+
+
+```
+project
+|__2020
+    |__data
+        |__models
+        |__output
+        |__raw
+            data_called.txt
+            fishery_age_comp_data.csv
+            fishery_catch_data.csv
+            fishery_obs_data.csv
+            fishery_size_comp_freq.csv
+            srv_age_comp.csv
+            srv_age_specimens.csv
+            srv_biomass.csv
+            srv_saa_age.csv
+            srv_saa_length.csv
+            srv_size_comp.csv
+            srv_size_freq.csv
+```
+
+### Clean and process data
+
+There are a suite of functions to process the raw data, the results are placed in the `output` folder.
+These functions need to be run in order.
+
+```{r}
+clean_catch(year, TAC)
+ageage(reader_tester = NULL, species, year, admb_home, region = "GOA", rec_age, plus_age)
+fish_age_comp(year, rec_age, plus_age)
+survey_age_comp(year, rec_age, plus_age)
+fish_size_comp(year, rec_age)
+survey_size_comp(year)
+size_at_age(year, admb_home, rec_age)
+weight_at_age(year, admb_home, rec_age)  
+# note: must provide a file for VAST survey biomass estimates otherwise D-B estimates are output
+survey_biomass(year) 
+concat_dat(year, "db", rec_age, plus_age) # create a .dat file in the "db" folder
+
+# VAST "bridge model"
+survey_biomass(year, "VAST_estimate_mesa.csv") 
+concat_dat(year, "m18.2", rec_age, plus_age) # create a .dat file in the "m18.2" folder
+```  
+
+### Run models
+
+Currently all models are being run through the ADMB command line.  
+Compile model, run model with -mcmc and -mcsave (if running mcmc...).  
+Run model with -mceval.  
+
+### Process results
+
+Define the model (e.g., folder) run the `process_results` function and the `base_plots` function. 
+
+The `process_results` function cleans outputs from ADMB and generates a series of .csv files that are placed within a folder titled `processed` nested in the model folder. 
+The function also creates a `figs` and `tables` folder within the model folder.
+
+The plotting function will populate the `figs` folder with a number of figures from the model output. 
+
+```{r}
+model = "db"
+process_results(year, model, model_name, data_name, rec_age, plus_age, 
+                mcmc = mcmc, mcsave = mcsave)
+
+base_plots(year, model, model_name, rec_age)
+
+
+model = "m18.2"
+
+process_results(year, model, model_name, data_name, rec_age, plus_age, 
+                mcmc = mcmc, mcsave = mcsave, survey = "VAST_estimate_mesa.csv")
+
+base_plots(year, model, model_name, rec_age)
+```
+
+
+```
+project
+|__2020
+    |__data
+    |__db
+    |   |__figs
+    |   |__processed
+    |   |__tables
+    |__m18.2
+        |__figs
+        |__processed
+        |__tables        
+```
+
+## Retrospective
+
+For any models that you have run mcmc draws on and would like retrospective examinations the following code can be used to run the retros. 
+The output will be placed in a `retro` folder in the model directory.
+
+```{r}
+# run retro ----
+run_retro(year, model = "m18.2", tpl_name = model_name, n_retro = 10,
+          admb_home = admb_home, mcmc = 500000, mcsave = 100)
+```
+
+Retrospective results can then be plotted. 
+These figures will be located in the `figs` folder.
+
+```{r}
+# plot retros ----
+plot_retro(year, model)
+plot_retro_survey(year, model)
+```
+

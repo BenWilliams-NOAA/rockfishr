@@ -18,11 +18,15 @@ modeldir <- function(year){
   }
 
   if (!dir.exists(here::here(year, "data", "raw"))){
-    dir.create(here::here(year, "data", "raw"), recursive=TRUE)
+    dir.create(here::here(year, "data", "raw"))
   }
 
   if (!dir.exists(here::here(year, "data", "user_input"))){
-    dir.create(here::here(year, "data", "user_input"), recursive=TRUE)
+    dir.create(here::here(year, "data", "user_input"))
+  }
+
+  if (!dir.exists(here::here(year, "data", "SARA"))){
+    dir.create(here::here(year, "data", "SARA"))
   }
 
   if (!dir.exists(here::here(year, "data", "models", "ageage"))){
@@ -30,19 +34,19 @@ modeldir <- function(year){
   }
 
   if (!dir.exists(here::here(year,"data", "models", "allometric"))){
-    dir.create(here::here(year,"data", "models", "allometric"), recursive=TRUE)
+    dir.create(here::here(year,"data", "models", "allometric"))
   }
 
   if (!dir.exists(here::here(year,"data", "models", "vbl"))){
-    dir.create(here::here(year,"data", "models", "VBL"), recursive=TRUE)
+    dir.create(here::here(year,"data", "models", "VBL"))
   }
 
   if (!dir.exists(here::here(year,"data", "models", "wvbl"))){
-    dir.create(here::here(year,"data", "models", "wVBL"), recursive=TRUE)
+    dir.create(here::here(year,"data", "models", "wVBL"))
   }
 
   if (!dir.exists(here::here(year,"data", "models", "length_sd"))){
-    dir.create(here::here(year,"data/models", "length_sd"), recursive=TRUE)
+    dir.create(here::here(year,"data/models", "length_sd"))
   }
 
 

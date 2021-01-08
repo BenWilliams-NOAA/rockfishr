@@ -20,7 +20,9 @@ knitr::opts_chunk$set(
 
 ## Goal
 
-The goal of rockfishr is to create a clear workflow for pulling and cleaning data for rockfish fishery stock assessments based upon the ADMB rockfish assessment model. It utilizes a "project oriented workflow" via RStudio. You must be able to have a connection to the AFSC & AKFIN (Answers) data servers (e.g., VPN if offsite), and have usernames/passwords setup.
+The goal of rockfishr is to create a clear workflow for pulling and cleaning data for rockfish fishery stock assessments based upon the ADMB rockfish assessment model. 
+It utilizes a "project oriented workflow" via RStudio. 
+You must be able to have a connection to the AFSC & AKFIN (Answers) data servers (e.g., VPN if offsite), and have usernames/passwords setup.
 
 ## Installation
 The `rockfishr` package can be installed from [github](https://github.com/BenWilliams-NOAA/rockfishr) with:
@@ -207,6 +209,13 @@ concat_dat(year, "db", rec_age, plus_age) # create a .dat file in the "db" folde
 survey_biomass(year, "VAST_estimate_mesa.csv") 
 concat_dat(year, "m18.2", rec_age, plus_age) # create a .dat file in the "m18.2" folder
 ```  
+
+Alternatively there is a function that will run all of these functions
+
+```{r}
+clean_raw(year, species, TAC, admb_home, rec_age, plus_age, reader_tester = NULL)
+```
+
 
 ### Run models
 

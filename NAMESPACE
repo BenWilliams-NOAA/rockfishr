@@ -2,6 +2,7 @@
 
 export("%>%")
 export(ageage)
+export(approved_model)
 export(base_plots)
 export(best_f)
 export(clean_catch)

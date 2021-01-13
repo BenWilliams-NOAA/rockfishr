@@ -8,12 +8,16 @@
 #' @export clean_catch
 #'
 #' @examples clean_catch(year, TAC, old_catch = )
-clean_catch <- function(year = 2020, TAC = c(3333, 2222, 1111)){
+clean_catch <- function(year = 2020, TAC = c(3333, 2222, 1111), old_catch = NULL){
 
   if(!is.null(old_catch)){
     old_catch = read.csv(here::here(year, "data", "user_input", old_catch))
   } else {
     old_catch = read.csv(here::here(year, "data", "user_input", "catch_1961-1992.csv"))
+  }
+
+  if(sum(TAC == c(3333, 2222, 1111))==3) {
+    stop("check your TAC!")
   }
 
   # Fishery catch data ----

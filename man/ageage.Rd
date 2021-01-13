@@ -21,7 +21,7 @@ ageage(
 
 \item{year}{= year of the assessment}
 
-\item{admb_home}{= location admb exists on your computer}
+\item{admb_home}{= location admb exists on your computer - if is "c:/admb" can leave NULL}
 
 \item{region}{= "GOA" (BSAI not currently setup)}
 
@@ -33,7 +33,7 @@ ageage(
 
 \item{...}{}
 
-\item{read_tester}{= location and file name (if left blank it looks for a file in "data/user_input/reader_tester.csv")}
+\item{read_tester}{= if left blank it looks for the following file:"data/user_input/reader_tester.csv"}
 }
 \value{
 

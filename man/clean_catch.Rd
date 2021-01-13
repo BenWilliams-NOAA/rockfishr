@@ -4,7 +4,7 @@
 \alias{clean_catch}
 \title{clean up catch data}
 \usage{
-clean_catch(year = 2020, TAC = c(3333, 2222, 1111))
+clean_catch(year = 2020, TAC = c(3333, 2222, 1111), old_catch = NULL)
 }
 \arguments{
 \item{year}{- year of assessment}

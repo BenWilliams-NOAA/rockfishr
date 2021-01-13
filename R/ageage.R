@@ -22,7 +22,7 @@ ageage <- function(reader_tester = NULL, species, year, admb_home = NULL, region
   if(is.null(reader_tester)){
     rt = read.csv(here::here(year, "data", "user_input", "reader_tester.csv"))
   } else{
-    rt = read.csv(rstudioapi::selectFile("Select File"))
+    rt = read.csv(here::here(year, "data", "user_input", reader_tester))
   }
 
   if(species == "NORK"){

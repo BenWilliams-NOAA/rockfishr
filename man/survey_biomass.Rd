@@ -4,12 +4,14 @@
 \alias{survey_biomass}
 \title{Get the survey biomass}
 \usage{
-survey_biomass(year, file = NULL)
+survey_biomass(year, type = NULL, file = NULL)
 }
 \arguments{
 \item{year}{of interest}
 
-\item{type:}{if not using the design-based abundance, the file name must be stated (e.g. "GAP_VAST.csv")}
+\item{type}{if not using the design-based abundance, the file name must be stated (e.g. "GAP_VAST.csv")}
+
+\item{file}{}
 }
 \value{
 

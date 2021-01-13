@@ -28,7 +28,11 @@ raw_data <- function(species, year, afsc_user, afsc_pwd, akfin_user, akfin_pwd, 
      norpac_species = 330
   }
 
+  species = sprintf("'%s'", paste(species, collapse = "','"))
+
+  # setup for changing regions in the future, or not...
   region = "GOA"
+  region = sprintf("'%s'", paste(region, collapse = "','"))
 
   if (!dir.exists(here::here(year, "data", "raw"))){
   dir.create(here::here(year, "data", "raw"), recursive=TRUE)
@@ -39,9 +43,27 @@ raw_data <- function(species, year, afsc_user, afsc_pwd, akfin_user, akfin_pwd, 
 
   # fishery catch data ----
 
-  if(species != "DUSK"){
   RODBC::sqlQuery(akfin,
-           paste0("SELECT COUNCIL.COMPREHENSIVE_BLEND_CA.YEAR,
+                  paste0("SELECT COUNCIL.COMPREHENSIVE_BLEND_CA.YEAR,
+         COUNCIL.COMPREHENSIVE_BLEND_CA.SPECIES_GROUP_NAME,
+         COUNCIL.COMPREHENSIVE_BLEND_CA.SPECIES_GROUP_CODE,
+         COUNCIL.COMPREHENSIVE_BLEND_CA.FMP_GEAR,
+         COUNCIL.COMPREHENSIVE_BLEND_CA.FMP_AREA,
+         COUNCIL.COMPREHENSIVE_BLEND_CA.FMP_SUBAREA,
+         COUNCIL.COMPREHENSIVE_BLEND_CA.WEEK_END_DATE,
+         COUNCIL.COMPREHENSIVE_BLEND_CA.WEIGHT_POSTED
+         FROM COUNCIL.COMPREHENSIVE_BLEND_CA
+         WHERE COUNCIL.COMPREHENSIVE_BLEND_CA.FMP_AREA = ", region, "
+         AND COUNCIL.COMPREHENSIVE_BLEND_CA.YEAR <= ", year,"
+                AND COUNCIL.COMPREHENSIVE_BLEND_CA.SPECIES_GROUP_CODE = ", species),
+                  believeNRows=FALSE) -> fcatch
+
+
+  if(species == "'DUSK'"){
+    fcatch %>%
+      dplyr::bind_rows(
+        RODBC::sqlQuery(akfin,
+                        paste0("SELECT COUNCIL.COMPREHENSIVE_BLEND_CA.YEAR,
          COUNCIL.COMPREHENSIVE_BLEND_CA.SPECIES_GROUP_NAME,
          COUNCIL.COMPREHENSIVE_BLEND_CA.SPECIES_GROUP_CODE,
          COUNCIL.COMPREHENSIVE_BLEND_CA.FMP_GEAR,
@@ -51,12 +73,14 @@ raw_data <- function(species, year, afsc_user, afsc_pwd, akfin_user, akfin_pwd, 
          COUNCIL.COMPREHENSIVE_BLEND_CA.WEIGHT_POSTED
          FROM COUNCIL.COMPREHENSIVE_BLEND_CA
          WHERE COUNCIL.COMPREHENSIVE_BLEND_CA.FMP_AREA = 'GOA'
-         AND COUNCIL.COMPREHENSIVE_BLEND_CA.YEAR <= ", year,"
-                AND COUNCIL.COMPREHENSIVE_BLEND_CA.SPECIES_GROUP_CODE = '", species,"'"),
-           believeNRows=FALSE) %>%
-    write.csv(here::here(year, "data", "raw", "fishery_catch_data.csv"), row.names = FALSE)
+         AND COUNCIL.COMPREHENSIVE_BLEND_CA.YEAR <= 2011
+         AND COUNCIL.COMPREHENSIVE_BLEND_CA.SPECIES_GROUP_CODE = 'PEL7'
+         OR COUNCIL.COMPREHENSIVE_BLEND_CA.SPECIES_GROUP_CODE = 'PELS'"),
+                        believeNRows=FALSE)
+      ) -> fcatch
+  }
 
-
+  write.csv(fcatch, here::here(year, "data", "raw", "fishery_catch_data.csv"), row.names = FALSE)
 
   RODBC::sqlQuery(akfin,
            paste0("SELECT NORPAC.DEBRIEFED_SPCOMP_MV.YEAR,
@@ -73,59 +97,6 @@ raw_data <- function(species, year, afsc_user, afsc_pwd, akfin_user, akfin_pwd, 
                 AND NORPAC.DEBRIEFED_SPCOMP_MV.SPECIES = ", norpac_species),
            believeNRows=FALSE) %>%
     write.csv(here::here(year, "data", "raw", "fishery_obs_data.csv"), row.names = FALSE)
-
-  } else {
-
-    RODBC::sqlQuery(akfin,
-                    paste0("SELECT COUNCIL.COMPREHENSIVE_BLEND_CA.YEAR,
-         COUNCIL.COMPREHENSIVE_BLEND_CA.SPECIES_GROUP_NAME,
-         COUNCIL.COMPREHENSIVE_BLEND_CA.SPECIES_GROUP_CODE,
-         COUNCIL.COMPREHENSIVE_BLEND_CA.FMP_GEAR,
-         COUNCIL.COMPREHENSIVE_BLEND_CA.FMP_AREA,
-         COUNCIL.COMPREHENSIVE_BLEND_CA.FMP_SUBAREA,
-         COUNCIL.COMPREHENSIVE_BLEND_CA.WEEK_END_DATE,
-         COUNCIL.COMPREHENSIVE_BLEND_CA.WEIGHT_POSTED
-         FROM COUNCIL.COMPREHENSIVE_BLEND_CA
-         WHERE COUNCIL.COMPREHENSIVE_BLEND_CA.FMP_AREA = 'GOA'
-         AND COUNCIL.COMPREHENSIVE_BLEND_CA.YEAR <= ", year,"
-                AND COUNCIL.COMPREHENSIVE_BLEND_CA.SPECIES_GROUP_CODE = '", species,"'"),
-                    believeNRows=FALSE) %>%
-      dplyr::bind_rows(
-        RODBC::sqlQuery(akfin,
-        paste0("SELECT COUNCIL.COMPREHENSIVE_BLEND_CA.YEAR,
-         COUNCIL.COMPREHENSIVE_BLEND_CA.SPECIES_GROUP_NAME,
-         COUNCIL.COMPREHENSIVE_BLEND_CA.SPECIES_GROUP_CODE,
-         COUNCIL.COMPREHENSIVE_BLEND_CA.FMP_GEAR,
-         COUNCIL.COMPREHENSIVE_BLEND_CA.FMP_AREA,
-         COUNCIL.COMPREHENSIVE_BLEND_CA.FMP_SUBAREA,
-         COUNCIL.COMPREHENSIVE_BLEND_CA.WEEK_END_DATE,
-         COUNCIL.COMPREHENSIVE_BLEND_CA.WEIGHT_POSTED
-         FROM COUNCIL.COMPREHENSIVE_BLEND_CA
-         WHERE COUNCIL.COMPREHENSIVE_BLEND_CA.FMP_AREA = 'GOA'
-         AND COUNCIL.COMPREHENSIVE_BLEND_CA.YEAR <= 2011
-         AND COUNCIL.COMPREHENSIVE_BLEND_CA.SPECIES_GROUP_CODE = 'PEL7'
-         OR COUNCIL.COMPREHENSIVE_BLEND_CA.SPECIES_GROUP_CODE = 'PELS'"),
-                      believeNRows=FALSE)) %>%
-      write.csv(here::here(year, "data", "raw", "fishery_catch_data.csv"), row.names = FALSE)
-
-
-
-    RODBC::sqlQuery(akfin,
-                paste0("SELECT NORPAC.DEBRIEFED_SPCOMP_MV.YEAR,
-                NORPAC.DEBRIEFED_SPCOMP_MV.HAUL_DATE,
-                NORPAC.DEBRIEFED_SPCOMP_MV.SPECIES,
-                NORPAC.DEBRIEFED_HAUL_MV.FMP_AREA,
-                NORPAC.DEBRIEFED_SPCOMP_MV.EXTRAPOLATED_WEIGHT
-                FROM NORPAC.DEBRIEFED_SPCOMP_MV
-                INNER JOIN NORPAC.DEBRIEFED_HAUL_MV
-                ON NORPAC.DEBRIEFED_SPCOMP_MV.JOIN_KEY = NORPAC.DEBRIEFED_HAUL_MV.JOIN_KEY
-                WHERE NORPAC.DEBRIEFED_SPCOMP_MV.YEAR BETWEEN ", year - 3,"
-                AND ", year - 1,"
-                AND NORPAC.DEBRIEFED_HAUL_MV.FMP_AREA = 'GOA'
-                AND NORPAC.DEBRIEFED_SPCOMP_MV.SPECIES = ", norpac_species),
-                    believeNRows=FALSE) %>%
-      write.csv(here::here(year, "data", "raw", "fishery_obs_data.csv"), row.names = FALSE)
-  }
 
   # fishery age comp ----
   age_data <- RODBC::sqlQuery(akfin,
